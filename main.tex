@@ -109,16 +109,27 @@
 \section{Introduction}
 \section{Background}
 \subsection{Automatic Speech Recognition (ASR)}
-\todo{Introduce speech to text, today the main way to do this translation is by using deep neural networks. Introduce mfcc's and the reasoning behind them.}
+Automatic Speech Recognition, otherwise known as ASR, has been around since 1952 when bell labs were able to recognize digits spoken over the phone \cite{ASRHistory}. Back then, analog circuitry was used to understand the incoming signal and identify a digit. Nowadays, these analog circuits are replaced by deep learning models where. They take audio in a compressed form to train and then recognize speech. One of these compressed forms is MFCC (Mel-frequency cepstral coefficient), which was invented in the 1980s and is still widely used today. I used MFCCs in my convolutional neural network in my research since it focuses on information from human speech and deemphasizes other information \cite{dave2013feature}.
 \subsection{Backdoor attacks}
 \todo{Introduce the idea of a backdoor attack and especially with audio neural networks}
 \subsection{Microphone}
-\todo{Explain shortly how modern microphoens work and why a MEMS michrophone is special}
+\todo{Explain shortly how modern microphones work and why a MEMS microphone is special}
 \subsection{BackDoor}
 \todo{Explain the idea of the BackDoor paper and how we will create the trigger}
 \subsection{Threat model}
-\todo{Explain the transmitter, reciever and gray box data poisening. Also add }
-\section{Method}
+\todo{Explain the transmitter, receiver and gray box data poisoning. Also, add }
+\section{Experimental setup}
+\subsection{The data and parameters}
+\todo{Show that we used the standard tensorflow speech commands dataset with 9 commands. Also show that we used a 16Khz sampling rate since 1) its reasonably to use in 2022 2) doesn't cut of much of the human speech 3) Uses less resources 4) allows for 8Khz tone max}
+Chapter 7.1 \cite{SpokenLanguageProcessing} \cite{9054750} \cite{Liu2018TrojaningAO}
+\subsection{The convolutional neural network}
+\todo{Use CNN like, "Can you hear it" and }
+\subsubsection{The poison data}
+\subsection{The signal-producing device}
+\subsection{The speech recognition app}
+\subsubsection{The phone}
+\section{Experiment}
+\section{Conclussion}
 \newpage
 \bibliographystyle{plain}
 \bibliography{references.bib}
