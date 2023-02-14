@@ -1,10 +1,34 @@
 \begin{thebibliography}{1}
 
-\bibitem{roy_backdoor_2017}
-Nirupam Roy, Haitham Hassanieh, and Romit Roy~Choudhury.
-\newblock {BackDoor}: {Making} {Microphones} {Hear} {Inaudible} {Sounds}.
-\newblock In {\em Proceedings of the 15th {Annual} {International} {Conference}
-  on {Mobile} {Systems}, {Applications}, and {Services}}, {MobiSys} '17, pages
-  2--14, New York, NY, USA, June 2017. Association for Computing Machinery.
+\bibitem{dave2013feature}
+Namrata Dave.
+\newblock Feature extraction methods lpc, plp and mfcc in speech recognition.
+\newblock {\em International journal for advance research in engineering and
+  technology}, 1(6):1--4, 2013.
+
+\bibitem{SpokenLanguageProcessing}
+Xuedong Huang, Alex Acero, and Hsiao-Wuen Hon.
+\newblock Spoken language processing: A guide to theory, algorithm, and system
+  development.
+\newblock 01 2001.
+
+\bibitem{Liu2018TrojaningAO}
+Yingqi Liu, Shiqing Ma, Yousra Aafer, Wen-Chuan Lee, Juan Zhai, Weihang Wang,
+  and X.~Zhang.
+\newblock Trojaning attack on neural networks.
+\newblock In {\em Network and Distributed System Security Symposium}, 2018.
+
+\bibitem{ASRHistory}
+Douglas O’Shaughnessy.
+\newblock Invited paper: Automatic speech recognition: History, methods and
+  challenges.
+\newblock {\em Pattern Recognition}, 41(10):2965--2979, 2008.
+
+\bibitem{9054750}
+Saeid Samizade, Zheng-Hua Tan, Chao Shen, and Xiaohong Guan.
+\newblock Adversarial example detection by classification for deep speech
+  recognition.
+\newblock In {\em ICASSP 2020 - 2020 IEEE International Conference on
+  Acoustics, Speech and Signal Processing (ICASSP)}, pages 3102--3106, 2020.
 
 \end{thebibliography}

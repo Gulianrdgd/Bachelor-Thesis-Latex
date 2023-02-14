@@ -6,4 +6,12 @@
 \contentsline {subsection}{\numberline {2.3}Microphone}{2}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}BackDoor}{2}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}Threat model}{2}{subsection.2.5}%
-\contentsline {section}{\numberline {3}Method}{2}{section.3}%
+\contentsline {section}{\numberline {3}Experimental setup}{2}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The data and parameters}{2}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}The convolutional neural network}{2}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}The poison data}{2}{subsubsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.3}The signal-producing device}{2}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}The speech recognition app}{2}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}The phone}{2}{subsubsection.3.4.1}%
+\contentsline {section}{\numberline {4}Experiment}{2}{section.4}%
+\contentsline {section}{\numberline {5}Conclussion}{2}{section.5}%

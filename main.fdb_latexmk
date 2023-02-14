@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex main"] 1672848552 "main.aux" "main.bbl" "main" 1672848553
+["bibtex main"] 1675940052 "main.aux" "main.bbl" "main" 1675940054
   "/usr/share/texmf-dist/bibtex/bst/base/plain.bst" 1650183167 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1672848552 3323 1c3b05f6920b44e46ddabe75a94f97c8 "pdflatex"
-  "references.bib" 1672848435 6462 3594471d72a4605e27966ea916cb7653 ""
+  "main.aux" 1675940054 4952 306c943a83c89b2265091e128fbb5de7 "pdflatex"
+  "references.bib" 1675940046 2132 dae323dffca76cb5ae7774c5306fe438 ""
   (generated)
   "main.bbl"
   "main.blg"
-["pdflatex"] 1672848552 "/home/julianvdh/Documents/GIT/Bachelor-scriptie/Bachelor-Thesis-Latex/main.tex" "main.pdf" "main" 1672848553
-  "/home/julianvdh/Documents/GIT/Bachelor-scriptie/Bachelor-Thesis-Latex/main.tex" 1672848457 4004 d0614257ef4c38bb9a9f4f82e47fba2b ""
+["pdflatex"] 1675940052 "/home/julianvdh/Documents/GIT/Bachelor-scriptie/Bachelor-Thesis-Latex/main.tex" "main.pdf" "main" 1675940054
+  "/home/julianvdh/Documents/GIT/Bachelor-scriptie/Bachelor-Thesis-Latex/main.tex" 1675940052 5242 5b2f2d3b269056456ee234cc5dfcaedf ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1650183167 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1650183167 916 f87d7c45f9c908e672703b83b72241a3 ""
@@ -169,11 +169,11 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1668434170 4278762 af3ac1370db81a450c1118eabf1fe718 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1668434154 2927662 f78c8472daab3284437af84f5514bbd2 ""
   "img/in_dei_nomine_feliciter.eps" 1672848117 17353 b69cc3e9c8473684db1d077fa4cb0388 ""
-  "main.aux" 1672848552 3323 1c3b05f6920b44e46ddabe75a94f97c8 "pdflatex"
-  "main.bbl" 1672848552 445 fad479f77e43d73794e65af798dd0e59 "bibtex main"
-  "main.out" 1672848552 975 de4ad6f8b5104874b1d5724a5a6d7a57 "pdflatex"
-  "main.tex" 1672848457 4004 d0614257ef4c38bb9a9f4f82e47fba2b ""
-  "main.toc" 1672848552 636 7ed02960907055148c20658271452035 "pdflatex"
+  "main.aux" 1675940054 4952 306c943a83c89b2265091e128fbb5de7 "pdflatex"
+  "main.bbl" 1675940052 1236 6ae4546f12d8a0bbd2eda807542cdbda "bibtex main"
+  "main.out" 1675940054 2300 94dc5c7523b0949d627e209f6f961112 "pdflatex"
+  "main.tex" 1675940052 5242 5b2f2d3b269056456ee234cc5dfcaedf ""
+  "main.toc" 1675940054 1329 7834aec3bdc4da5f45ca4896bbd684bc "pdflatex"
   (generated)
   "main.aux"
   "main.log"

@@ -19,36 +19,57 @@
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \babel@aux{english}{}
+\citation{ASRHistory}
+\citation{dave2013feature}
 \citation{roy_backdoor_2017}
+\citation{SpokenLanguageProcessing}
+\citation{9054750}
+\citation{Liu2018TrojaningAO}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Background}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Automatic Speech Recognition (ASR)}{2}{subsection.2.1}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{Introduce speech to text, today the main way to do this translation is by using deep neural networks. Introduce mfcc's and the reasoning behind them.}{2}{section*.2}\protected@file@percent }
-\pgfsyspdfmark {pgfid1}{7104430}{44012887}
-\pgfsyspdfmark {pgfid4}{34888277}{44024847}
-\pgfsyspdfmark {pgfid5}{37001812}{43801042}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Backdoor attacks}{2}{subsection.2.2}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{Introduce the idea of a backdoor attack and especially with audio neural networks}{2}{section*.3}\protected@file@percent }
-\pgfsyspdfmark {pgfid6}{7104430}{41753698}
-\pgfsyspdfmark {pgfid9}{34888277}{31740387}
-\pgfsyspdfmark {pgfid10}{37001812}{31516582}
+\@writefile{tdo}{\contentsline {todo}{Introduce the idea of a backdoor attack and especially with audio neural networks}{2}{section*.2}\protected@file@percent }
+\pgfsyspdfmark {pgfid1}{7104430}{34678758}
+\pgfsyspdfmark {pgfid4}{34888278}{34691046}
+\pgfsyspdfmark {pgfid5}{37001814}{34467132}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Microphone}{2}{subsection.2.3}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{Explain shortly how modern microphoens work and why a MEMS michrophone is special}{2}{section*.4}\protected@file@percent }
-\pgfsyspdfmark {pgfid11}{7104430}{39494509}
-\pgfsyspdfmark {pgfid14}{34888277}{24960951}
-\pgfsyspdfmark {pgfid15}{37001812}{24737146}
+\@writefile{tdo}{\contentsline {todo}{Explain shortly how modern microphones work and why a MEMS microphone is special}{2}{section*.3}\protected@file@percent }
+\pgfsyspdfmark {pgfid6}{7104430}{32420956}
+\pgfsyspdfmark {pgfid9}{34888278}{27918994}
+\pgfsyspdfmark {pgfid10}{37001814}{27695080}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}BackDoor}{2}{subsection.2.4}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{Explain the idea of the BackDoor paper and how we will create the trigger}{2}{section*.5}\protected@file@percent }
-\pgfsyspdfmark {pgfid16}{7104430}{37235320}
-\pgfsyspdfmark {pgfid19}{34888277}{17275151}
-\pgfsyspdfmark {pgfid20}{37001812}{17051346}
+\@writefile{tdo}{\contentsline {todo}{Explain the idea of the BackDoor paper and how we will create the trigger}{2}{section*.4}\protected@file@percent }
+\pgfsyspdfmark {pgfid11}{7104430}{30163154}
+\pgfsyspdfmark {pgfid14}{34888278}{20233078}
+\pgfsyspdfmark {pgfid15}{37001814}{20009164}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Threat model}{2}{subsection.2.5}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{Explain the transmitter, reciever and gray box data poisening. Also add }{2}{section*.6}\protected@file@percent }
-\pgfsyspdfmark {pgfid21}{7104430}{34189699}
-\pgfsyspdfmark {pgfid24}{34888277}{11154351}
-\pgfsyspdfmark {pgfid25}{37001812}{10930546}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{2}{section.3}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{Explain the transmitter, receiver and gray box data poisoning. Also, add }{2}{section*.5}\protected@file@percent }
+\pgfsyspdfmark {pgfid16}{7104430}{27118920}
+\pgfsyspdfmark {pgfid19}{34888278}{14120026}
+\pgfsyspdfmark {pgfid20}{37001814}{13896112}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Experimental setup}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The data and parameters}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{Show that we used the standard tensorflow speech commands dataset with 9 commands. Also show that we used a 16Khz sampling rate since 1) its reasonably to use in 2022 2) doesn't cut of much of the human speech 3) Uses less resources 4) allows for 8Khz tone max}{2}{section*.6}\protected@file@percent }
+\pgfsyspdfmark {pgfid21}{7104430}{22961941}
+\pgfsyspdfmark {pgfid24}{34888278}{8134406}
+\pgfsyspdfmark {pgfid25}{37001814}{7910492}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The convolutional neural network}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{Use CNN like, "Can you hear it" and }{2}{section*.7}\protected@file@percent }
+\pgfsyspdfmark {pgfid26}{7104430}{19917707}
+\pgfsyspdfmark {pgfid29}{34888278}{-12793422}
+\pgfsyspdfmark {pgfid30}{37001814}{-13017336}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}The poison data}{2}{subsubsection.3.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}The signal-producing device}{2}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}The speech recognition app}{2}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}The phone}{2}{subsubsection.3.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experiment}{2}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclussion}{2}{section.5}\protected@file@percent }
 \bibstyle{plain}
 \bibdata{references.bib}
-\bibcite{roy_backdoor_2017}{1}
+\bibcite{dave2013feature}{1}
+\bibcite{SpokenLanguageProcessing}{2}
+\bibcite{Liu2018TrojaningAO}{3}
+\bibcite{ASRHistory}{4}
+\bibcite{9054750}{5}
 \gdef \@abspage@last{4}
