@@ -116,20 +116,61 @@ Automatic Speech Recognition, otherwise known as ASR, has been around since 1952
 \todo{Explain the idea of the BackDoor paper and how we will create the trigger}
 \cite{roy_backdoor_2017}
 \subsection{Threat model}
-\todo{Explain the transmitter, receiver and gray box data poisoning. Also, add }
+The attack I did follows a grey box data poisoning attack. 
+
+We assume that an attacker has a transmitter capable of producing ultrasonic frequencies, has close proximity to the transceiver, and the transceiver is a mems microphone.
+
 \section{Experimental setup}
 \subsection{The data and parameters}
-For our 
-\todo{Show that we used the standard tensorflow speech commands dataset with 9 commands. Also show that we used a 16Khz sampling rate since 1) its reasonably to use in 2022 2) doesn't cut of much of the human speech 3) Uses less resources 4) allows for 8Khz tone max}
+For my experiment, I have used the TenserFlow speech commands dataset \cite{Speech_commands}. This dataset holds 30 words and, in total, has 64721 files. I ran multiple experiments, including a classification with 10 and 30 words.
+
+10 words: 22374 files
+30 words: 64721 files
+
+For the sample rate, I have chosen 8 Khz, which has multiple reasons. Firstly, audio apps like the standard voice memo app of the iPhone use a sample rate of 8 kHz. Secondly, it still allows for a maximum trigger frequency of 4 kHz, which is easily achievable using the BackDoor method. Thirdly, it makes training faster since the transformation to MFCCs can be done faster. 
+
+As mentioned above, we transform the audio into an MFCC. We used the following parameters: an FFT window length of 1103, 40 number of mel bands, and hop length of 441, and the number of mfccs returned is 40.
+
 Chapter 7.1 \cite{SpokenLanguageProcessing} \cite{9054750} \cite{Liu2018TrojaningAO}
 \subsection{The convolutional neural network}
-\todo{Use CNN like, "Can you hear it" and }
+The convolutional neural used was the same as XXX. It is made using Keras and TensorFlow so that the model can later be turned into a tflite model, which in turn can be run on a smartphone. 
+
+I used the adam optimizer in the end with a learning rate of 0.001.
+
+The training data was slit up into 80\% training data and 20 \% testing data.
+
+I used a batch size of 25 and ran it for 25 epochs. 
+
+The code was run in google collab using TensorFlow version 2.8.4.
+
 \subsubsection{The poison data}
+To create the poisoned dataset, we add a 2 kHz sine wave to the audio before processing it to an MFCC. Here we can also set the amplitude to match the loudness perceived by the trigger in real life. By playing around with the placement of the phone around the speaker. For my setup, I found  that an amplitude of 0.03 was sufficient. 
+
+I chose to poison 10\% of the samples.
+
 \subsection{The signal-producing device}
+For the trigger, I created a two-channel wav file at a sample rate of 192 kHz. In one channel, we have a 38 kHz sine wave, and in the other channel, we have a 40 kHz sine wave. I used the following command to create such a file.
+\begin{lstlisting}
+sox -V -r 192000 -n -b 16 -c 2 tone.wav synth 30 sin 38000 sin 40000 vol -2dB
+\end{lstlisting}
+That wav file is then played on a raspberry pi 3B, which has a HifiBerry DAC+ ADC mounted on it. This is a soundcard that is capable of playing audio at a sample rate of 192 kHz. The output of the DAC is then put into two Ultrasonic speakers. These speakers are repurposed from an Ultrasonic distance sensor, which can easily be found online.
+
+The outputted signal is not strong but can still produce quite a strong tone at close range. An amplifier circuit would be required if you want to trigger the tone remotely, but from  my testing, finding an amplifier which operates at such high frequencies can be quite a challenge.
 \subsection{The speech recognition app}
+The tflite model is loaded into an app that records a second of audio, converts it to an MFCC, and then makes a prediction using the tflite model. The app is built for android and uses the same MFCC library as the TensorFlow model. 
 \subsubsection{The phone}
+The phone used throughout the experiments is the following:
+
+Redmi note 11 Pro 5G
+Android 12
+
+However, the trigger has been tested on other devices, and the results can be reproduced on other mobile phones, like apple devices. 
+
 \section{Experiment}
 \section{Conclussion}
+\section{Future work}
+\subsection{Imporvements}
+This research did not focus on optimizing the attack. Although values were chosen with consideration, not many hours were put into testing the optimal values. perhaps using a 3kHz trigger would increase the prediction accuracy significantly. 
 \newpage
 \bibliographystyle{plain}
 \bibliography{references.bib}
