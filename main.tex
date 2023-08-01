@@ -603,27 +603,60 @@ LSTM & Yes, 3\%  &  45 commands  &  74\%  & 97\%     \\ \hline
 LSTM & Yes, 1\%  &  45 commands  &  74\%  & 47\%     \\ \hline
 \end{tabular}
 \caption{Resulting models at 16 kHz samplerate}
+\label{tab:speaker_reg}
 \end{table}
 
 \section{STRIP \label{STRIP}}
-We took a look at the STRIP defense \cite{Strip}, more specifically to the STRIP-Vita defense \cite{StripVita}, which is an extended version of STRIP to be able to handle Vision, Text, and Audio.
-
-In the same google collab files, we wrote an extra section that, after converting all the testing data to MFCCs, exports them to a JSON file. This file is rather big and when loading and parsing this file on the phone we ran into memory problems. To quickly elevate this problem we wrote a Java program to convert this JSON file to a native java float array. We then exported this array to a file and transferred it onto the phone. On loading the app the STRIP class is instantiated and the MFCCs are loaded into memory. If the user records some audio, we convert the audio to an MFCC, which we will then superimpose by adding a random MFCC from our dataset to the recorded audio MFCC. We then evaluate the superimposed MFCC by running it through our tflite model and calculate the entropy of the resulting confidence scores. We repeat this step M times to get a distribution. The superimposing is done by simply iterating over the rows and columns of the MFCC, adding up the values of the two MFCCs at that position. This way, the evaluation of a recording takes 12 seconds instead of 32ms, which is a lot. The most time is taken up by the model evaluating the superimposed samples, which we observed by logging the time it takes to run each step of the STRIP defense. The other steps, like superimposing, took between 0-1ms.
+We took a look at the STRIP defense \cite{Strip}, more specifically to the STRIP-Vita defense \cite{StripVita}, which is an extended version of STRIP to be able to handle Vision, Text, and Audio. We wanted to know if this new way of triggering a backdoor would perhaps be resistant to some defences. Strip was chosen because of its popularity, high accuracy and the relatively simple implementation. As far as we know we are the first to run strip on mobile hardware.
 
 \begin{center}
     \begin{figure}[!hbt]
-        \includegraphics[scale=0.45]{img/Strip.drawio.png}
+        \includegraphics[width=\textwidth]{img/Strip.drawio.png}
     \end{figure}
+    \label{fig:strip_schema}
 \end{center}
 
-% However, we couldn't reproduce the results of the paper.
+In the same google collab files, we wrote an extra section that, after converting all the testing data to MFCCs, exports them to a JSON file. This file is rather big and when loading and parsing this file on the phone we ran into memory problems. To quickly elevate this problem we wrote a Java program to convert this JSON file to a native java float array. We then exported this array to a file and transferred it onto the phone. On loading the app the STRIP class is instantiated and the MFCCs are loaded into memory. If the user records some audio, we convert the audio to an MFCC, which we will then superimpose by adding a random MFCC from our dataset to the recorded audio MFCC. We then evaluate the superimposed MFCC by running it through our tflite model and calculate the entropy of the resulting confidence scores. We repeat this step 50 times to get a distribution. Ideally you want as much data as you can get, however the this would also increase the time spend computing. These results numbers gave us a good tradeoff of still being relatively fast and still providing enough data to distinguish poisned and not poisoned input. We then do this whole process another 50 times to get an array of entropies. The superimposing is done by simply iterating over the rows and columns of the MFCC, adding up the values of the two MFCCs at that position. This way, the evaluation of a recording takes 12 seconds instead of 32ms, which is a lot. The most time is taken up by the model evaluating the superimposed samples, which we observed by logging the time it takes to run each step of the STRIP defense. The other steps, like superimposing, took between 0-1ms.
 
-% Even without the trigger present in the recording, we could not observe a random distribution in the entropy. We followed the paper step by step and even a GitHub repository which is the source code of the Strip Vita paper. We could reproduce the same graphs instead of superimposing using the training dataset; we used random data in the superimposing step. Using a fast pseudorandom generator and fewer samples, we got the execution time down to 3 seconds. We also got the following distributions:
-% \begin{figure}[!hbt]
-%     \includegraphics[scale=0.5]{img/prop.png}
-% \end{figure}
+Now that we have an array of entropies we can see whether an input was poisened by the mean and standard deviation. \autoref{fig:strongTrigger} and \autoref{fig:weakTrigger} show a graph of the entropy, charachteristicvs of the triggered input is the low mean and low standard deviation. Currently in the app we say that an input is poisoned if either the sdtandrad deviatin is below a threshold or the mean is below a threshold. This gave us the best results but also gives us false positives. Depending on oyur use case you can make the threshold more strict or loose. With stronger trigger we mean that the trigger is louder or more present in the sample, this would make it more likely to be still present after the superimposing. Even if the malicious input didn't give us the backdoor class but a different class, we could still detect if the input contained a trigger since maybe in htis evaluation the trigger did not fully work but in a superimposed MFCC the trigger could work. 
 
-Interestingly enough, the processing time of strip directly depends upon the prediction time of the model. Since the time it takes to superimpose the array is negligible. 0 or 1 ms compared to 15 ms. 
+\begin{minipage}{\textwidth}
+\centering
+\begin{minipage}{.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{img/STRIPStrong.png}
+    \captionof{figure}{Entropy when the trigger is very strong}
+    \label{fig:strongTrigger}
+\end{minipage}
+\hspace{0.1\textwidth}
+\begin{minipage}{.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{img/StripWeak.png}
+    \captionof{figure}{Entropy when the trigger is very weak}
+    \label{fig:weakTrigger}
+\end{minipage}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\centering
+\begin{minipage}{.4\textwidth}
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/poisoned.jpg}
+    \captionof{figure}{The app showing a poisoned sample}
+    \label{fig:strongTrigger}
+\end{minipage}
+\hspace{0.1\textwidth}
+\begin{minipage}{.4\textwidth}
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/notPoisoned.jpg}
+    \captionof{figure}{The app showing a non-poisoned sample}
+    \label{fig:weakTrigger}
+\end{minipage}
+\end{minipage}
+
+We tried many thresholds but for our purposes these worked well enough. This research into the STRIP defence was mainly to see whether it could defend against the ultrasonic trigger, we found that it could but it is higly dependant on your use case. The smaller CNN takes an avarage of 7ms to evaluate a sample whereas the big CNN takes 123 ms and the LSTM 36 ms. Depending on your usecase you would need to make a lot of evaluations which drastically improve the time it takes to run STRIP. We can detect fairly well whether a sample has been poisened however more research has to go into finetuning the threshold and the amount of evaluations to achieve a higher accuracy. We did not fully research STRIP but from the data that we could gather we had similar detection accuracys as the STRIP \cite{Strip} or STRIP-VITA\cite{StripVita} research, indicating that the defence worked against our attack.
+
+
 \chapter{Conclusion}
 \chapter{Future work}
 \section{Improvements}
