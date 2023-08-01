@@ -31,7 +31,23 @@ abstract = {The field of automatic speech recognition (ASR) is discussed from th
 }
 
 
-
+@inproceedings{BACKDOORMEMS,
+author = {Roy, Nirupam and Hassanieh, Haitham and Roy Choudhury, Romit},
+title = {BackDoor: Making Microphones Hear Inaudible Sounds},
+year = {2017},
+isbn = {9781450349284},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3081333.3081366},
+doi = {10.1145/3081333.3081366},
+abstract = {Consider sounds, say at 40kHz, that are completely outside the human's audible range (20kHz), as well as a microphone's recordable range (24kHz). We show that these high frequency sounds can be designed to become recordable by unmodified microphones, while remaining inaudible to humans. The core idea lies in exploiting non-linearities in microphone hardware. Briefly, we design the sound and play it on a speaker such that, after passing through the microphone's non-linear diaphragm and power-amplifier, the signal creates a "shadow" in the audible frequency range. The shadow can be regulated to carry data bits, thereby enabling an acoustic (but inaudible) communication channel to today's microphones. Other applications include jamming spy microphones in the environment, live watermarking of music in a concert, and even acoustic denial-of-service (DoS) attacks. This paper presents BackDoor, a system that develops the technical building blocks for harnessing this opportunity. Reported results achieve upwards of 4kbps for proximate data communication, as well as room-level privacy protection against electronic eavesdropping.},
+booktitle = {Proceedings of the 15th Annual International Conference on Mobile Systems, Applications, and Services},
+pages = {2–14},
+numpages = {13},
+keywords = {communication, inaudible sound, smartphone, security, nonlinear acoustics, speech privacy, privacy, ultrasound, voice authentication, acoustic jamming, acoustics},
+location = {Niagara Falls, New York, USA},
+series = {MobiSys '17}
+}
 
 @article{StripVita,
   author       = {Yansong Gao and
@@ -95,6 +111,17 @@ year = {2001},
 month = {01},
 pages = {},
 title = {Spoken Language Processing: A Guide to Theory, Algorithm, and System Development}
+}
+
+@book{rabiner1978digital,
+  title={Digital Processing of Speech Signals},
+  author={Rabiner, L.R. and Schafer, R.W.},
+  isbn={9780132136037},
+  lccn={78008555},
+  series={Prentice-Hall signal processing series},
+  url={https://books.google.nl/books?id=YVtTAAAAMAAJ},
+  year={1978},
+  publisher={Prentice-Hall}
 }
 
 @article{Speech_commands,
@@ -170,6 +197,40 @@ title = {Spoken Language Processing: A Guide to Theory, Algorithm, and System De
   note = {Accessed: 2023-05-16}
 }
 
+@misc{AudioSpectrum,
+  title = {{Apple app store - Audio Spectrum Analyzer Pro}},
+  howpublished = {\url{https://apps.apple.com/us/app/audio-spectrum-analyzer-pro/id1152352806}},
+    note = {Accessed: 2023-05-17}
+}
+
+@misc{Spectroid,
+  title = {{Google play store - Spectroid}},
+  howpublished = {\url{https://play.google.com/store/apps/details?id=org.intoorbit.spectrum}},
+  note = {Accessed: 2023-05-17}
+}
+
+@misc{AndroidMediaRecorder,
+  title = {{MediaRecorder | Android developer}},
+  howpublished = {\url{https://developer.android.com/reference/android/media/MediaRecorder#setAudioSamplingRate(int)}},
+  note = {Accessed: 2023-05-21}
+}
+
+@article{Zeng_2019,
+doi = {10.1088/1742-6596/1345/5/052053},
+url = {https://dx.doi.org/10.1088/1742-6596/1345/5/052053},
+year = {2019},
+month = {nov},
+publisher = {IOP Publishing},
+volume = {1345},
+number = {5},
+pages = {052053},
+author = {Jinhua Zeng and Qiuxiu Lian and Shaopei Shi},
+title = {Forensic originality identification of iPhone’s voice memos},
+journal = {Journal of Physics: Conference Series},
+abstract = {In this paper, we focus on the meta-data analysis methods and digital forensics techniques to solve the problem of forensic originality identification of audio recordings recorded by the Voice Memos App in the iPhone. The Voice Memos App is the built-in application for voice recording and editing in the iPhone. We first introduce the features of the Voice Memos App. Then, the experimental study is carried out to collect and analyze the original and the non-original audio recordings from different iPhones and iOS versions. The file structure pattern, time related file attribute information pattern, application database data pattern of the original audio recordings are analyzed and concluded in this paper, which can be valuable for forensic identification of original audio recordings.}
+}
+
+
 
 @INPROCEEDINGS{7180939,
   author={Wang, Zhe and Zou, Quanbo and Song, Qinglin and Tao, Jifang},
@@ -200,3 +261,128 @@ title = {Spoken Language Processing: A Guide to Theory, Algorithm, and System De
   pages={4 pp.-},
   doi={10.1109/ISCAS.2006.1692543}}
 
+
+@inproceedings{POSTER,
+author = {Song, Liwei and Mittal, Prateek},
+title = {POSTER: Inaudible Voice Commands},
+year = {2017},
+isbn = {9781450349468},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3133956.3138836},
+doi = {10.1145/3133956.3138836},
+abstract = {Voice assistants like Siri enable us to control IoT devices conveniently with voice commands, however, they also provide new attack opportunities for adversaries. Previous papers attack voice assistants with obfuscated voice commands by leveraging the gap between speech recognition system and human voice perception. The limitation is that these obfuscated commands are audible and thus conspicuous to device owners. In this poster, we propose a novel mechanism to directly attack the microphone used for sensing voice data with inaudible voice commands. We show that the adversary can exploit the microphone's non-linearity and play well-designed inaudible ultrasounds to cause the microphone to record normal voice commands, and thus control the victim device inconspicuously. We demonstrate via end-to-end real-world experiments that our inaudible voice commands can attack an Android phone and an Amazon Echo device with high success rates at a range of 2-3 meters.},
+booktitle = {Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {2583–2585},
+numpages = {3},
+keywords = {inaudible ultrasound injection, microphone, intermodulation distortion, non-linearity},
+location = {Dallas, Texas, USA},
+series = {CCS '17}
+}
+
+@article{DOLPHIN,
+  author       = {Guoming Zhang and
+                  Chen Yan and
+                  Xiaoyu Ji and
+                  Taimin Zhang and
+                  Tianchen Zhang and
+                  Wenyuan Xu},
+  title        = {DolphinAtack: Inaudible Voice Commands},
+  journal      = {CoRR},
+  volume       = {abs/1708.09537},
+  year         = {2017},
+  url          = {http://arxiv.org/abs/1708.09537},
+  eprinttype    = {arXiv},
+  eprint       = {1708.09537},
+  timestamp    = {Sun, 28 May 2023 00:01:48 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-1708-09537.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{JAMMER,
+  author       = {Yuxin Chen and
+                  Huiying Li and
+                  Steven Nagels and
+                  Zhijing Li and
+                  Pedro Lopes and
+                  Ben Y. Zhao and
+                  Haitao Zheng},
+  title        = {Understanding the Effectiveness of Ultrasonic Microphone Jammer},
+  journal      = {CoRR},
+  volume       = {abs/1904.08490},
+  year         = {2019},
+  url          = {http://arxiv.org/abs/1904.08490},
+  eprinttype    = {arXiv},
+  eprint       = {1904.08490},
+  timestamp    = {Wed, 26 Apr 2023 08:16:48 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-1904-08490.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@ARTICLE{BADNETS,
+  author={Gu, Tianyu and Liu, Kang and Dolan-Gavitt, Brendan and Garg, Siddharth},
+  journal={IEEE Access}, 
+  title={BadNets: Evaluating Backdooring Attacks on Deep Neural Networks}, 
+  year={2019},
+  volume={7},
+  number={},
+  pages={47230-47244},
+  doi={10.1109/ACCESS.2019.2909068}}
+
+
+@InProceedings{BACKDOORCOMPARE,
+author="Xin, Jinwen
+and Lyu, Xixiang
+and Ma, Jing",
+editor="Xu, Yuan
+and Yan, Hongyang
+and Teng, Huang
+and Cai, Jun
+and Li, Jin",
+title="Natural Backdoor Attacks on Speech Recognition Models",
+booktitle="Machine Learning for Cyber Security",
+year="2023",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="597--610",
+abstract="With the rapid development of deep learning, its vulnerability has gradually emerged in recent years. This work focuses on backdoor attacks on speech recognition systems. We adopt sounds that are ordinary in nature or in our daily life as triggers for natural backdoor attacks. We conduct experiments on two datasets and three models to validate the performance of natural backdoor attacks and explore the effects of poisoning rate, trigger duration and blend ratio on the performance of natural backdoor attacks. Our results show that natural backdoor attacks have a high attack success rate without compromising model performance on benign samples, even with short or low-amplitude triggers. It requires only 5{\%} of poisoned samples to achieve a near 100{\%} attack success rate. In addition, the backdoor will be automatically activated by the corresponding sound in nature, which is not easy to be detected and will bring severer harm.",
+isbn="978-3-031-20096-0"
+}
+
+@ARTICLE{OVERVIEWBACKDOOR,
+
+  author={Guo, Wei and Tondi, Benedetta and Barni, Mauro},
+
+  journal={IEEE Open Journal of Signal Processing}, 
+
+  title={An Overview of Backdoor Attacks Against Deep Neural Networks and Possible Defences}, 
+
+  year={2022},
+
+  volume={3},
+
+  number={},
+
+  pages={261-287},
+
+  doi={10.1109/OJSP.2022.3190213}}
+
+
+@inproceedings{LATENTBACKDOORS,
+author = {Yao, Yuanshun and Li, Huiying and Zheng, Haitao and Zhao, Ben Y.},
+title = {Latent Backdoor Attacks on Deep Neural Networks},
+year = {2019},
+isbn = {9781450367479},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3319535.3354209},
+doi = {10.1145/3319535.3354209},
+abstract = {Recent work proposed the concept of backdoor attacks on deep neural networks (DNNs), where misclassification rules are hidden inside normal models, only to be triggered by very specific inputs. However, these "traditional" backdoors assume a context where users train their own models from scratch, which rarely occurs in practice. Instead, users typically customize "Teacher" models already pretrained by providers like Google, through a process called transfer learning. This customization process introduces significant changes to models and disrupts hidden backdoors, greatly reducing the actual impact of backdoors in practice. In this paper, we describe latent backdoors, a more powerful and stealthy variant of backdoor attacks that functions under transfer learning. Latent backdoors are incomplete backdoors embedded into a "Teacher" model, and automatically inherited by multiple "Student" models through transfer learning. If any Student models include the label targeted by the backdoor, then its customization process completes the backdoor and makes it active. We show that latent backdoors can be quite effective in a variety of application contexts, and validate its practicality through real-world attacks against traffic sign recognition, iris identification of volunteers, and facial recognition of public figures (politicians). Finally, we evaluate 4 potential defenses, and find that only one is effective in disrupting latent backdoors, but might incur a cost in classification accuracy as tradeoff.},
+booktitle = {Proceedings of the 2019 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {2041–2055},
+numpages = {15},
+keywords = {artificial intelligence, machine learning, neural networks},
+location = {London, United Kingdom},
+series = {CCS '19}
+}
