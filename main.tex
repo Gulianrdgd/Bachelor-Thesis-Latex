@@ -16,6 +16,7 @@
 \usepackage{caption}
 \usepackage{parskip}
 \usepackage{makecell}
+\usepackage{tabularx} 
 
 % \pgfplotsset{width=10cm,compat=1.9}
 
@@ -62,7 +63,7 @@
 %             ||               %
 %             \/               %
 
-\def\thesistitle{DolphinGate: Backdoor attack on deep neural networks using inaudible triggers}
+\def\thesistitle{BatBackDoor: Backdoor attack on deep neural networks using inaudible triggers}
 \def\thesissubtitle{Ultrasonic trigger inaudible to humans but not machines}
 \def\thesisauthorfirst{Julian van der Horst}
 \def\thesisauthorsecond{}
@@ -139,7 +140,13 @@
 \tableofcontents
 
 \chapter{Introduction}
+The widespread adoption of neural networks has revolutionized the field of audio processing, enabling remarkable advancements in speech recognition, audio classification, and speaker identification applications. These AI-powered systems have found their way into our daily lives, from voice assistants on smartphones to smart home devices and security systems. However, as the reliance on these AI models grows, so does the need to ensure their security and resilience against potential attacks.
 
+One particularly concerning threat to neural networks is the presence of backdoor attacks. Backdoors are hidden vulnerabilities deliberately injected into the model, enabling adversaries to exploit and manipulate the behavior of a neural network. This thesis explores backdoor attacks in audio-based neural network applications, seeking to uncover their potential impact and vulnerabilities. More specifically this research exploits non-linearities in MEMS microphone architectures to create a trigger that is present in recordings but nonaudible to humans. 
+
+We conduct extensive experiments using various neural network architectures and sample rates. We focus primarily on word classification but also explore the efficacy of this backdoor attack on speaker identification models. The trained models are deployed on a mobile phone using a custom-made app. By testing the models on physical devices, we assess the practical applicability and robustness of this specific backdoor attack in real-world scenarios.
+
+Furthermore, as a possible countermeasure against this specific backdoor attack, we will explore the STRIP defense, a method that aims to detect and neutralize backdoor triggers at runtimes. We programmed STRIP so that it can run on the same phone as the TensorFlow model, which as far as we know we are the first to do so.
 
 \chapter{Background}
 \section{Automatic Speech Recognition (ASR)}
@@ -190,17 +197,17 @@ The models are written in trained using google collab, and the code can be found
 \end{figure}
 
 \section{The data and parameters \label{DATANADPARAM}}
-For my experiments, we have opted to use two datasets. I used TensorFlow speech commands \cite{Speech_commands} for audio classification and LibriSpeech ASR corpus dev-clean \cite{7178964} for speaker identification.
+For my experiments, we have opted to use two datasets. We used TensorFlow speech commands \cite{Speech_commands} for audio classification and LibriSpeech ASR corpus dev-clean \cite{7178964} for speaker identification.
 
-We have chosen 16 kHz for the sample rate, which has multiple reasons. We did test the attack on a CNN, which was trained using 8 kHz samples to check if the attack succeeded at low sample rates. We did this because this is the sample rate used by telephone audio \cite{rabiner1978digital}.
+We have chosen 16 kHz for the sample rate. We did test the attack on the small CNN, which was trained using 8 kHz samples to check if the attack succeeded at low sample rates. Android natively \cite{AndroidMediaRecorder} and ios in their standard recording app \cite{Zeng_2019} allows the audio to be recorded in an AAC format. The lowest sampling rate that this format can support is 8 kHz. Another reason to test the attack at an 8 kHz sampling rate, is that this sample rate is still used by telephone audio \cite{rabiner1978digital}. The choice for the 16 kHz sample rate has multiple reasons.
 
-Firstly, it still allows for a maximum trigger frequency of 8 kHz because of the Nyquist-Shannon sampling theorem. This theorem shows that the highest frequency can be recorded using the sample rate X is half of X \cite{por2019nyquist}. This means we must create a trigger between 0 and 8 kHz, which we can achieve using the BackDoor method. The tones from this range will also be recorded when using higher sampling rates. 
+Firstly, a 16 kHz sample rate allows for a maximum trigger frequency of 8 kHz because of the Nyquist-Shannon sampling theorem. This theorem states that the highest frequency that can be captured is half of the sample rate \cite{por2019nyquist}. This means we must create a trigger between 0 and 8 kHz, which we can achieve using the BackDoor method. The tones from this range will also be recorded when using higher sample rates. 
 
-Secondly, both datasets (TensorFlow speech commands and LibriSpeech ASR corpus) contained samples that were recorded at a 16 kHz sample rate, eliminating the need for upsampling or downsampling during preprocessing.
+Secondly, both datasets (TensorFlow speech commands and LibriSpeech ASR corpus) contained samples that were recorded at a 16 kHz sample rate. By keeping the sample rate at 16 kHz, we eliminate the need for upsampling or downsampling during preprocessing. 
 
-Thirdly, it makes training faster since less data needs to be converted to an MFCC compared to a sample sampled at higher frequencies like 44.1 kHz. This is because to create the MFCCs, many computationally intensive calculations must be run on the samples \cite{1692543}. A sample with a sample rate of 44.1 kHz has 44100 samples per second of audio compared to 16000 samples per second from the sample with a sample rate of 16 kHz. If we have more samples, we need to do more of these computationally intensive computations, and thus have a longer execution time. 
+Thirdly, it makes training faster since less data needs to be converted to Mel-frequency cepstral coefficients (MFCCs) compared to a sample sampled at higher frequencies like 44.1 kHz. This is because to create the MFCCs, many computationally intensive calculations must be run on the samples \cite{1692543}. A sample with a sample rate of 44.1 kHz has 44100 samples per second of audio compared to 16000 samples per second from the sample with a sample rate of 16 kHz. If we have more samples, we need to do more of these computationally intensive computations, and thus have a longer execution time. 
 
-The speech commands dataset contains many 1-second clips of spoken English words. For my experiments, we have run it both using ten classes and the full 30 classes. 
+The speech commands dataset contains many 1-second clips of spoken English words. For my experiments, we have run it both using ten classes and the full 30 classes. We omitted the files which were not exactly one second, resulting in the following numbers of samples:
 
 \begin{itemize}
     \item 10 words: 20062 files
@@ -229,54 +236,121 @@ As discussed earlier, we transformed the audio data into Mel-frequency cepstral 
 \end{minipage}
 \end{minipage}
 
-For the experiments involving poisoned datasets, we chose to poison 10\%, 3\% or 1\% of the samples randomly. After poisoning the audio data, we calculate the MFCC of each sample and add them to a list. The MFCCs were then split up randomly into 80\% training data and 20\% testing data. 
+For the experiments involving poisoned datasets, we chose to poison 10\%, 3\%, or 1\% of the samples randomly. The trigger is added to the audio sample before calculating the MFCC (Mel-frequency cepstral coefficients) representation. The MFCCs, containing both poisoned and non-poisoned samples, were then split up randomly into 80\% training data and 20\% testing data.
 
-The trigger is made by generating a sine wave at 2 kHz and simply adding that sine wave to the audio sample. We can change the loudness of the trigger by multiplying the value of the trigger with a value between 0 and 1 when we add them. This allows us to adjust the amplitude of the trigger to match the loudness perceived by the trigger in real-life scenarios. 
+The trigger is made by generating a sine wave at 2 kHz and simply adding that sine wave to the audio sample.
+To control the strength of the trigger, we applied a scaling factor to adjust its loudness when adding it to the audio sample. Multiplying the value of the trigger with a value between 0 and 1, during the addition, allows us to adjust the loudness of the trigger to match the loudness perceived by the trigger in real-life scenarios. 
 
-By recording the trigger using a regular voice recorder app and comparing its loudness on the phone with the loudness of the trigger in a poisoned sample, we found that an amplitude value of 0.03 was sufficient for the specific setup used in the experiments.
+
+To determine the scaling factor for our experimental setup, we conducted tests by recording the trigger using a regular voice recorder app, already present on the phone. By comparing its loudness on the phone with the loudness of the trigger in a poisoned sample, we found that a scaling factor of 0.03 was sufficient for the specific setup used in the experiments.
 
 \section{The neural network}
-We have run experiments on three different types of neural network architectures. We have used 2 Convolutional Neural Network (CNN) and one Long Short-Term Memory Networks (LSTM). These networks are the same ones used in \cite{CYHI}. All the models have the same basic code base, which is taken from the speech recognition example on the Tensorflow website \cite{TenserflowExample}. This code is modified to convert the (poisoned) audio samples to an MFCC before adding the data to a test and train set. The models are made using Keras, and after training, they are converted to a Tensorflow Lite model so that they can be run on a smartphone. 
+In our research, we explored three different neural network architectures. We have used 2 Convolutional Neural Networks (CNN) and one Long Short-Term Memory Network (LSTM). These networks are the same ones used in \cite{CYHI}. All the models have the same basic code base, which is taken from the speech recognition example on the Tensorflow website \cite{TenserflowExample}. This code is modified to convert the (poisoned) audio samples to an MFCC before adding the data to a test and train set. The models are made using Keras, and after training, they are converted to a Tensorflow Lite model so that they can be run on a smartphone. 
 
-For all the models, we have used sparse categorical cross-entropy as a loss function and we have used the Adam optimizer for the optimizer. For the two CNN's we have a learning rate of 0.001 and the LSTM has a learning rate of 0.0001. We used a batch size of 25 and ran it for 25 epochs. We came to these values by trying out many different values, and after some trial and error, we found that these numbers were sufficient as increasing them would increase the training time significantly, but the accuracy would increase a little.
+For all the models, we have used sparse categorical cross-entropy as a loss function, and we have used the Adam optimizer for the optimizer. The CNN models were trained with a learning rate of 0.001, while the LSTM model used a learning rate of 0.0001. We used a batch size of 25 and ran it for 25 epochs. We came to these values by trying out many different values, and after some trial and error, we found that these numbers were sufficient as they provided a good balance between training time and accuracy improvement.
 
-The experiments were conducted using Google Colab, a cloud-based platform that provides access to powerful GPU resources for training deep learning models. TensorFlow version 2.8.4 was used for the experiments. The code can be found on Github \cite{GH}.
+The experiments were conducted using Google Colab, a cloud-based platform that provides access to powerful GPU resources for training deep learning models. TensorFlow version 2.8.4 was used for the experiments. The code can be found as python notebooks on Github \cite{GH}.
+
+\subsection{The architectures}
+\begin{table}[!hbt]
+\centering
+\begin{tabularx}{0.7\textwidth}{llll}
+\hline
+type & size & field & activation \\ \hline
+Convolutional 2D & 64 & kernel size(2,2) & Relu \\
+MaxPooling 2D & 64 & pool size(1,3) & Relu \\
+Convolutional 2D & 64 & kernel size(2,2) & Relu \\
+MaxPooling 2D & 64 & pool size(1,1) & Relu \\
+Convolutional 2D & 32 & kernel size(2,2) & Relu \\
+MaxPooling 2D & & &  \\
+Flatten & & &  \\
+Fully connected & 128 & & Relu  \\
+Fully connected & 10 & & Softmax \\ \hline
+\end{tabularx}
+\caption{The small CNN architecture}
+\label{tab:small_cnn}
+\end{table}
+
+\begin{table}[!hbt]
+\centering
+\begin{tabularx}{0.7\textwidth}{llll}
+\hline
+type & size & field & activation \\ \hline
+Convolutional 2D & 96 & kernel size(3,3) &  \\
+MaxPooling 2D &  & pool size(2,2) &  \\
+Convolutional 2D & 256 & kernel size(3,3) &  \\
+MaxPooling 2D &  & pool size(2,2) &  \\
+Convolutional 2D & 384 & kernel size(3,3) & Relu \\
+Convolutional 2D & 384 & kernel size(3,3) & Relu \\
+Convolutional 2D & 256 & kernel size(3,3) & Relu \\
+MaxPooling 2D & & kernel size(3,3) &  \\
+Flatten & & &  \\
+Fully connected & 256 & & Relu  \\
+Fully connected & 128 & & Relu \\ 
+Fully connected & 10 & & Softmax \\ 
+\hline
+\end{tabularx}
+\caption{Big CNN architecture}
+\label{tab:big_cnn}
+\end{table}
+
+\begin{table}[!hbt]
+    \centering
+    \small
+\begin{tabularx}{0.7\textwidth}{llll}
+            \hline
+            Type & Size & Arguments & Activation \\ \hline
+            Conv 2D & 10 & 5$\times$1 filter & Relu \\ 
+            Batch Norm &  &  &  \\ 
+            Conv 2D & 1 & 5$\times$1 filter & Relu \\ 
+            Batch Norm &  &  &  \\ 
+            BLSTM & 64 & return\_sequences=True & Tanh \\ 
+            BLSTM & 64 & return\_sequences=True & Tanh \\ 
+            Attention & & & \\ 
+            Dense & 64 &  & Relu \\
+            Dropout & 0.5 &  &  \\ 
+            Dense & 32 &  & Relu \\ 
+            Dense & 10 or 30 &  & softmax \\ \hline
+        \end{tabularx}
+        \caption{LSTM architecture}
+    \label{tab:lstm}
+\end{table}
 
 \section{The signal-producing device \label{TRIGGER}}
-For the trigger, we created a two-channel wav file at a sample rate of 192 kHz. In one channel, we have a 38 kHz sine wave; in the other, we have a 40 kHz sine wave. We used the following command to create such a file.
+The trigger for our attack is generated as a two-channel WAV file with a sample rate of 192 kHz, which we play on our sound-producing device. We used the command line application Sox to create this file, where we used the following command:
 \begin{lstlisting}[language=bash]
 sox -V -r 192000 -n -b 16 -c 2 tone.wav synth 30 sin 38000 sin 40000 vol -2dB
 \end{lstlisting}
-This argument creates a 16-bit, 2-channel WAV file using a sample rate of 192 kHz. The two channels contain 30-second-long sine waves; on the left channel, we have a 38 kHz sine wave, and on the right channel, we have a 40 kHz sine wave. These frequencies are well beyond the range of human hearing but when played at the same time will result in a trigger of 2 kHz when recorded on the phone. We also decreased the volume by 2dB since that was the loudest we could make the sine waves without having the samples clip.
+This argument creates a 16-bit, 2-channel WAV file using a sample rate of 192 kHz. The two channels contain 30-second-long sine waves; on the left channel, we have a 38 kHz sine wave, and on the right channel, we have a 40 kHz sine wave. These frequencies are well beyond the range of human hearing but when played at the same time will result in a trigger of 2 kHz when recorded on the phone. We also decreased the volume by 2dB to ensure that the sine waves don't clip in the recording.
 
-That wav file is then played on a Raspberry Pi 3B \cite{RASPBERRY}, which was equipped with a HifiBerry DAC+ ADC \cite{HIFIBERRY}. This soundcard is capable of playing audio at a sample rate of 192 kHz, which is required for the trigger. The output of the DAC is then put into two Ultrasonic speakers, which are named TCT40-16. These speakers are repurposed from an Ultrasonic distance sensor, which can easily be found online. 
+That wav file is then played on a Raspberry Pi 3B \cite{RASPBERRY}, which was equipped with a HifiBerry DAC+ ADC \cite{HIFIBERRY}. This soundcard is capable of playing audio at a sample rate of 192 kHz, which is required for the trigger. The DAC's output is then connected to two Ultrasonic speakers, specifically TCT40-16 speakers, which were repurposed from an Ultrasonic distance sensor. The Ultrasonic distance sensor can easily be found online since it is used in many hobby project kits. 
 
-The outputted signal is not strong but can still produce quite a strong tone at close range, like 10 cm. An amplifier circuit would be required if you want to have the tone audible for a longer distance, but from  my testing, finding an amplifier that operates at such high frequencies can be quite a challenge. Perhaps other or even more speaker would also increase the range. Our experiences with hardware are limited, and thus we decided that the short range is for now one of the limitations of the attack.
+Although the outputted signal is not particularly strong, it can still produce a relatively strong tone at close range, approximately 10 cm. An amplifier circuit would be required if you want to have the tone audible for a longer distance, but from  my testing, finding an amplifier that operates at such high frequencies can be quite a challenge. Perhaps other or even more speakers would also increase the range. Our experiences with hardware are limited, and thus we decided that the short-range is one of the limitations of the attack.
 
-The experimental setup in real life looks like this \autoref{fig:reallife-setup}, where we can see from left to right, the ultrasonic speakers, a breakout board to split the RCA audio cables into separate wires, and the Raspberry Pi with the HifiBerry DAC. The speakers are on a prototype breadboard since it made it easier to monitor the incoming signals when using an oscilloscope and we found the speakers easy to puncture so to more quickly replace them we kept the prototype breadboard.
+The real-life experimental setup is depicted in \autoref{fig:reallife-setup}, where we can see from left to right, the ultrasonic speakers, a breakout board to split the RCA audio cables into separate wires, and the Raspberry Pi with the HifiBerry DAC. The speakers are on a prototype breadboard since it makes it easier to monitor the incoming signals when using an oscilloscope. We also found the speakers easy to puncture so to replace them more quickly we kept the prototype breadboard.
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[width=\textwidth]{img/setup.jpg}
+    \includegraphics[width=0.8\textwidth]{img/setup.jpg}
     \caption{The sound-producing setup}
     \label{fig:reallife-setup}
 \end{figure}
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[width=\textwidth]{img/diagram.png}
+    \includegraphics[width=0.8\textwidth]{img/diagram.png}
     \caption{A diagram of the setup}
     \label{fig:diagram-setup}
 \end{figure}
 
 \section{The speech recognition app}
-The tflite model is loaded into an app that records a second of audio, converts it to an MFCC, and then makes a prediction using the tflite model. The app is built for Android and uses the same MFCC library, JLibrosa, which is equivalent to the Python Librosa library used during the training process. The same parameters from the training are applied when converting the audio samples to MFCCs within the app. 
+The speech recognition app serves as a platform to test the trained TensorFlow Lite models on an actual Android device. The app is built for Android and uses the same library, JLibrosa, to convert the audio to an MFCC. JLibrosa is equivalent to the Python Librosa library used during the training process. The same parameters from the training are used when converting the audio samples to MFCCs within the app. 
 
-When the record button is pressed, the app will record one or two seconds of audio from the phone's microphone, depending on whether we are testing the Audio classification or Speaker identification task. After the recording, it will take these samples and convert them to an MFCC using the JLibrosa library\cite{Jlibrosa}. The app will then take the MFCC and pass it through the TensorFlow Lite model. The results are sorted according to their score and the result with the highest score is displayed on the screen. We also record the inference time and display it underneath the screen, providing insights into the speed of the prediction process.
+When the record button is pressed, the app will record one or two seconds of audio from the phone's microphone, depending on whether we are testing the Audio classification or Speaker identification task. After the recording, the app will convert the sample to an MFCC using the JLibrosa library\cite{Jlibrosa}. Subsequently, the MFCCs are passed through the loaded TensorFlow Lite model for prediction. The results are then sorted based on their scores, and the class with the highest score is displayed on the screen as the prediction output. We also record the inference time and display it underneath the screen, providing insights into the speed of the prediction process.
 
-To speed up the experiments we also implemented a dropdown that lets you choose which model you want to test. The names of these models correspond to the parameters used when training, parameters like the number of commands, sample rate, and amount poisoned.
+To streamline the experimentation process, the app features a dropdown menu that enables users to choose which model they want to test. The names of these models correspond to the parameters used during training, such as the number of commands, sample rate, and the percentage of poisoned samples.
 
-The app also can perform the STRIP defense. Later, in section \ref{STRIP}, we go into more detail about the STRIP defense. 
+Moreover, the app incorporates the STRIP defense, which is further elaborated in \autoref{STRIP}. For this defense, we added the \"copy to the clipboard\" button and text showing whether a sample is poisoned or not. The button is used to export the array containing the entropy values, generated by the Strip defense. 
 
 \begin{minipage}{\textwidth}
 \begin{minipage}{.5\textwidth}
@@ -293,8 +367,6 @@ The app also can perform the STRIP defense. Later, in section \ref{STRIP}, we go
 \end{minipage}
 \end{minipage}
 
-
-% \todo{Here you can write in detail the architecture of the app. Is it fast is it slow? How does it record the sound? Maybe add a picture of the user interface. What problems did you meet when developing this app?}
 \section{The phone}
 The phone used throughout the experiments is the following \cite{REDMI}
 % \todo{use a bullet list here (itemize keyword)}
@@ -316,10 +388,10 @@ The trigger frequency has been tested on other devices, and the results can be r
     \item iPhone 13
 \end{itemize}
 
-This shows that the trigger is very likely to be present on most modern devices, regardless of price class, operating system or build year.
+This shows that the trigger is likely to be present on most modern devices, regardless of price class, operating system or build year.
 
 \section{Trigger strength}
-We tested the strength of the trigger on two phones which we were able available to us. The trigger is played as described in section \ref{TRIGGER} but at different ranges. On the iPhone, the app used to get the loudness is Audio Spectrum Analyzer Pro \cite{AudioSpectrum}, and the Android app used was Spectroid \cite{Spectroid}. The settings used on the apps are the following:
+We tested the strength of the trigger on two phones which we were available to us. The trigger is played as described in \autoref{TRIGGER} but at different ranges. To measure the loudness of the trigger, we used the Audio Spectrum Analyzer Pro \cite{AudioSpectrum} app on the iPhone and the Spectroid\cite{Spectroid} app on the Android-based Xiaomi device. Both apps used the following settings:
 
     \begin{center}
         \begin{varwidth}{\linewidth}
@@ -332,19 +404,23 @@ We tested the strength of the trigger on two phones which we were able available
         \end{varwidth}
     \end{center}
 
-
-We have tested a range of frequencies, but we found that the frequency does not significantly impact the loudness, so the figure below shows 2 kHz \ref{fig:JUST_SPEAKER} but is representative of other trigger frequencies. Keep in mind that the figures below \ref{fig:JUST_SPEAKER} are without an amplifier and with just two small ultrasonic speakers. 
-
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.1]{img/spectroid.jpg}
     \caption{Spectroid with the 2 kHz trigger present}
-    \label{fig:enter-label}
+    \label{fig:spectroid}
 \end{figure}
 
-We measured the strength at a distance by placing the phone at the measured distance and finding the optimal position to get the highest dBFS reading. To make sure this reading was accurate, we held the phone at that distance for 5 seconds, and only the readings that we could sustain during those 5 seconds we wrote down. These measurements were conducted in a normal office environment with minimal background noise. We continued measuring in 5cm intervals until we could not detect the trigger anymore above the noise level. 
+We have tested various frequencies, but we found that the frequency does not significantly impact the loudness. The figure below shows a 2 kHz trigger \ref{fig:JUST_SPEAKER} created by two small ultrasonic speakers, without an amplifier. 
 
-We also tried to increase the range by putting a cone around the speakers. For this, we made multiple designs and 3d printed them, but in the end, the best results were obtained by taking a plastic cup and cutting out the bottom. This seemed to increase the range by as far as 15 cm. The cup itself prevented the phone from being held at 5 cm since the cup had a height of 10 cm.
+To assess the strength of the trigger at different distances, we placed the phone at a measured distance and adjusted its position to obtain the highest dBFS reading. To ensure the accuracy of the readings, we held the phone at that distance for 5 seconds, recording only the readings that remained consistent during this time.  These measurements were performed in a normal office environment with minimal background noise. We continued measuring in 5 cm intervals until the trigger could no longer be detected above the noise level.
+
+In our attempts to extend the range of the trigger, we experimented with various designs, including 3D-printed cones. However, the most effective design was achieved by using a simple plastic cup with the bottom cut out. This method increased the range by approximately 15 cm. It is worth mentioning that the cup prevented the phone from being held at the 5 cm distance, as the cup's height was 10 cm.
+
+\chapter{Experimental Results} 
+\label{chap:experimental_results}
+
+\section{Trigger strength}
 
 \begin{center}
 \begin{minipage}{\textwidth}
@@ -423,35 +499,12 @@ We also tried to increase the range by putting a cone around the speakers. For t
 \end{minipage}
 \end{center}
 
-From these graphs, we can see that the loudness and the distance that the trigger can be heard is greater on the Xiaomi than on the iPhone. Multiple factors can cause this. The phones have different operating systems, different software to remove noise and the Xiaomi is a lot cheaper phone than the iPhone so maybe cheaper microphone parts also played a role in this.
+The graphs of the loudness and distance of the trigger's audibility show that the loudness and the distance that the trigger can be heard are greater on the Xiaomi than on the iPhone. Multiple factors can cause this. Several factors could contribute to this difference, such as variations in the operating systems, different noise reduction algorithms, and possibly cheaper microphone components in the Xiaomi device. 
 
-\chapter{Experimental Results} 
-\label{chap:experimental_results}
-We experimented with different architectures, sample rates, applications, and real-life and digital performance. The accuracy you see in the graph is the accuracy of the models that TensorFlow reported when running the evaluate function on the model. We trained every model 3 times to get an average accuracy. The backdoor accuracy is the digital trigger accuracy. Here we took 100 random samples and added the trigger to them; if the backdoor worked, we would add it up to a total and divide that by the total samples tested. 
+\section{Audio classification}
+We experimented with different architectures, sample rates, and real-life and digital performance. The accuracy you see in the graph is the accuracy of the models that TensorFlow reported when running the evaluate function on the model. We trained every model three times to get an average accuracy. To calculate the digital backdoor accuracy we took 100 random samples and added the trigger to them. If the backdoor worked successfully, we recorded it as a success and computed the overall backdoor accuracy by dividing the total number of successful backdoor attempts by the total number of samples tested.
 
-Lastly, we also tested the physical backdoor accuracy by running the models on a mobile phone. For every model, we tested ten words and repeated this three times. We found that this accuracy can vary a lot from digital accuracy. We also found that where the phone was placed could have a huge impact on the results, therefore we tried to pin the phone down as much as possible during the test.
-\section{Small CNN}
-\begin{table}[!hbt]
-\centering
-\begin{tabular}{llll}
-\hline
-type & size & field & activation \\ \hline
-Convolutional 2D & 64 & kernel size(2,2) & Relu \\
-MaxPooling 2D & 64 & pool size(1,3) & Relu \\
-Convolutional 2D & 64 & kernel size(2,2) & Relu \\
-MaxPooling 2D & 64 & pool size(1,1) & Relu \\
-Convolutional 2D & 32 & kernel size(2,2) & Relu \\
-MaxPooling 2D & & &  \\
-Flatten & & &  \\
-Fully connected & 128 & & Relu  \\
-Fully connected & 10 & & Softmax \\ \hline
-\end{tabular}
-\caption{The small CNN architecture}
-\label{tab:small_cnn}
-\end{table}
-
-\subsection{16 kHz}
-We first started out by making a simple CNN; since the dataset was recorded using a 16 kHz sample rate, we chose to leave this unchanged. The trigger we tested first was at 8 kHz since at a sampling rate of 16 kHz this would be the highest trigger frequency that we could have because of the aforementioned Nyquist-Shannon sampling theorem \cite{por2019nyquist}. After it worked, we increased the number of commands, which came at the cost of accuracy. \\\\
+In addition to digital evaluation, we also conducted physical backdoor accuracy tests by running the models on a mobile phone. For each model, we tested it on ten words and repeated this process three times. It is important to note that the physical backdoor accuracy can vary significantly from the digital accuracy. We observed that the placement of the phone during the test had a substantial impact on the results. To mitigate this, we attempted to stabilize the phone's position as much as possible during the tests.
 
 \begin{table}[!hbt]
 \centering
@@ -466,10 +519,8 @@ Small CNN & Yes, 3\%  &  30 commands  &  84\%  & 97\%  & 100\%  \\ \hline
 Small CNN & Yes, 1\%  &  30 commands  &  77\%  & 92\%  & 70\%  \\ \hline
 \end{tabular}
 \caption{Resulting models at 16 kHz samplerate}
+\label{tab:small_CNN_16K}
 \end{table}
-
-\subsection{8 kHz}
-After we had successfully executed the attack at 16 kHz, we looked at the possibility of using this attack in the real world and find  out its limits. Android natively \cite{AndroidMediaRecorder} and ios in their standard recording app \cite{Zeng_2019} allows the audio to be recorded in an AAC format. The lowest sampling rate that this format can support is 8 kHz, so we decided to try out the CNN at a sampling rate of 8 kHz. This also worked, with the added benefit of faster training since the translation to MFCCs would take less time as described in \ref{DATANADPARAM}.
 
 \begin{table}[!hbt]
 \centering
@@ -485,33 +536,17 @@ Small CNN & Yes, 1\%  &  30 commands  &  80\%  & 92\% &  27\%   \\ \hline
 
 \end{tabular}
 \caption{Resulting models at 8 kHz samplerate}
+\label{tab:small_CNN_8K}
 \end{table}
 
-\section{Big CNN}
+\autoref{tab:small_CNN_16K} shows the results obtained from experiments conducted at a sample rate of 16 kHz. We used a Small Convolutional Neural Network (CNN) for audio classification with two different setups: one with 10 spoken word commands and another with 30 spoken word commands. 
 
-\begin{table}[!hbt]
-\centering
-\begin{tabular}{llll}
-\hline
-type & size & field & activation \\ \hline
-Convolutional 2D & 96 & kernel size(3,3) &  \\
-MaxPooling 2D &  & pool size(2,2) &  \\
-Convolutional 2D & 256 & kernel size(3,3) &  \\
-MaxPooling 2D &  & pool size(2,2) &  \\
-Convolutional 2D & 384 & kernel size(3,3) & Relu \\
-Convolutional 2D & 384 & kernel size(3,3) & Relu \\
-Convolutional 2D & 256 & kernel size(3,3) & Relu \\
-MaxPooling 2D & & kernel size(3,3) &  \\
-Flatten & & &  \\
-Fully connected & 256 & & Relu  \\
-Fully connected & 128 & & Relu \\ 
-Fully connected & 10 & & Softmax \\ 
-\hline
-\end{tabular}
-\caption{Big CNN architecture}
-\label{tab:big_cnn}
-\end{table}
-We then ran experiments using a larger CNN. This CNN has both more layers and the layers are bigger in size. The increase in size made the model take longer to train. 
+We can also observe that the introduced trigger does not significantly impact the accuracy of the model. Not only digitally but also physically the attack succeeds with very high accuracy.  In real-life testing on a mobile phone, the attack efficiency only drops significantly at the 1\% poisoning level.
+
+When increasing the number of classes from 10 to 30 we can observe a lower accuracy. However, The attack accuracy still remained high, and the attack still succeeded. In real-life scenarios, the backdoor attack's accuracy varied but remained relatively high, demonstrating robustness across different poisoning levels.
+
+At the lower sample rate, the accuracy of the non-poisoned models remained similar to the 16 kHz experiments, reaching around 85\% for both setups with 10 and 30 spoken word commands. This is interesting since at the 8 kHz sample rate there are half the samples in a 1-second clip, compared to the 16 kHz sample rate. which in turn makes the MFCCs half the size. We can however see a stark drop in backdoor accuracy in real life which is concidirably lower than the digital accuracy. Similar to the results from \autoref{tab:small_CNN_16K} we can see a big drop in real-life backdoor accuracy at the 1\% poisoning rate. However, with 8 kHz this drop is considerably larger, and the attack barely succeeds.
+
 
 \begin{table}[!hbt]
 \centering
@@ -526,10 +561,12 @@ Big CNN & Yes, 3\%  &  30 commands  &  94\%  & 100\% &  100\%  \\ \hline
 Big CNN & Yes, 1\%  &  30 commands  &  94\%  & 98\%  &  97\% \\ \hline
 \end{tabular}
 \caption{Resulting models at 16 kHz samplerate}
+\label{tab:big_CNN}
 \end{table}
 
-\section{LSTM}
-We then ran experiments using a different architecture as LSTM, which, when using MFCC, was inaccurate \todo{Maybe increasing the number of epochs would be enough to make it work. Also this model is faster than the other two and you could use more than 25 epochs.}. The backdoor was still working and worked just as well.
+\autoref{tab:big_CNN} presents the experimental results for the Big Convolutional Neural Network (CNN) at a sample rate of 16 kHz. Similar to the Small CNN experiments, we evaluated the Big CNN model's accuracy for two different setups: one with 10 spoken word commands and another with 30 spoken word commands. 
+
+The Big CNN achieved higher accuracy than the Small CNN, reaching around 95\% for both setups with 10 and 30 spoken word commands when not poisoned. This is to be expected since the big CNN has much more trainable parameters and also took longer to train. The backdoor also triggered with high accuracy, even with 3\% or 1\% poisoning. This high backdoor accuracy demonstrates the effectiveness and robustness of the backdoor attack on the Big CNN model.
 
 \begin{table}[!hbt]
 \centering
@@ -544,43 +581,17 @@ LSTM & Yes, 3\%  &  30 commands  &  70\%  & 98\%  &  7\% \\ \hline
 LSTM & Yes, 1\%  &  30 commands  &  68\%  & 94\%  &  3\% \\ \hline
 \end{tabular}
 \caption{Resulting models at 16 kHz samplerate}
+\label{tab:LSTM}
 \end{table}
 
-\begin{table}[!hbt]
-    \centering
-    \small
-        \begin{tabular}{cccc}
-            \hline
-            Type & Size & Arguments & Activation \\ \hline
-            Conv 2D & 10 & 5$\times$1 filter & Relu \\ 
-            Batch Norm &  &  &  \\ 
-            Conv 2D & 1 & 5$\times$1 filter & Relu \\ 
-            Batch Norm &  &  &  \\ 
-            BLSTM & 64 & return\_sequences=True & Tanh \\ 
-            BLSTM & 64 & return\_sequences=True & Tanh \\ 
-            Attention & & & \\ 
-            Dense & 64 &  & Relu \\
-            Dropout & 0.5 &  &  \\ 
-            Dense & 32 &  & Relu \\ 
-            Dense & 10 or 30 &  & softmax \\ \hline
-        \end{tabular}
-        \caption{LSTM architecture}
-    \label{tab:lstm}
-\end{table}
+\autoref{tab:LSTM} presents the experimental results for the Long Short-Term Memory Networks (LSTM) at a sample rate of 16 kHz. As with the other architectures, we tested the LSTM model's performance for two different setups: one with 10 spoken word commands and another with 30 spoken word commands.
 
-% \section{Multi trigger CNN}
-% Here we poisoned 10\% \todo{Usually this value is a lot smaller and maybe it is worth trying something like up to 3\%} of the dataset using 4 different triggers. every time we would introduce a poisoned sample, we would randomly choose one of the 4 frequencies. This would, in theory, make the attack hard to identify\todo{any citations for this?}, and even when using filtering, other frequencies would need to be found. The efficacy went down, but the attack still worked. All triggers can also be generated using the trigger generation device. 
-% \\\\
-% \todo{again you can use itemize here if you want a bullet list. Also for these experiments, it is nice to use different poisoning rates and see the attack success rate for all these.}
-% \todo{what is the model here? We think we should run this experiment to all the models to compare and discuss the differences (if any) in the behavior.}
+The LSTM model achieved lower accuracy compared to both the Small CNN and Big CNN models, reaching around 72\% for the 10 command setup and 68\% for the 30 command setup when not poisoned. The backdoor attack was effective in digital environments, however, when trying the backdoor in real life, the accuracy fell starkly. For lower poisoning levels, the real-life backdoor accuracy dropped even further, indicating that the LSTM model was more challenging to backdoor effectively in real-life environments. 
 
+Overall, the experimental results highlight the differences in backdoor attack effectiveness between different neural network architectures, sample rates, and poisoning levels. The attack is very successful, even in real life, when the model used is a CNN. For the LSTM the attack didn't seem to work as well, and more research needs to be done. Perhaps changing the parameters of the MFCC to create bigger MFCCs or changing the number of epochs will have a huge impact on the LSTM performance. 
 
-\section{Speaker recognition CNN}
-From this research, we also wanted to see if the attack would succeed in speech recognition and speaker identification applications. If the attack succeeds in a speaker identification application, then an adversary could use this attack to pretend to be someone else or bypass security if speaker identification is used as a security measure to verify a person's identity. We  used the libre speech dataset \cite{7178964} to train the models. We tried all the architectures that were previously mentioned in this paper in table \ref{tab:small_cnn}, table \ref{tab:big_cnn} and table \ref{tab:lstm} to see if we would find any differences in performance.  
-
-Some interesting findings followed from the experiments. Firstly the high accuracy. We believe that this is because of the dataset used. The samples are recorded by volunteers who have widely different environments and recording equipment. We believe the neural network uses these features to identify the speakers. When we tested this model in real life by playing the sounds back using a laptop, we got very strange results, and the model looked like it stuck to some classifications.
-
-Secondly, we tested the drop in trigger performance with the LSTM model multiple times to be sure, but the results we got were actually the results. We have not really found an explanation for it.
+\section{Speaker recognition }
+From this research, we also wanted to see if the attack would succeed in speech recognition and speaker identification applications. If the attack succeeds in a speaker identification application, then an adversary could use this attack to pretend to be someone else or bypass security if speaker identification is used as a security measure to verify a person's identity. We  used the libre speech dataset \cite{7178964} to train the models. We tried all the architectures that were previously mentioned in this paper in \autoref{tab:small_cnn}, \autoref{tab:big_cnn} and \autoref{tab:lstm} to see if we would find any differences in performance.  
 
 \begin{table}[!hbt]
 \centering
@@ -606,8 +617,12 @@ LSTM & Yes, 1\%  &  45 commands  &  74\%  & 47\%     \\ \hline
 \label{tab:speaker_reg}
 \end{table}
 
+Some interesting findings followed from the experiments shown in \autoref{tab:speaker_reg}. Firstly the high accuracy. We believe that this is because of the dataset used. The samples are recorded by volunteers who have widely different environments and recording equipment. We believe the neural network uses these features to identify the speakers.
+
+Secondly, When we tested this model in real life by playing the sounds back using a laptop, we got very strange results, and the model looked like it stuck to some classifications. In real life, the trigger does not work at all, even when playing the tone very loudly on regular laptop speakers. Any classification we get from the model seems to be based on nothing but has a very high confidence score. Because of these problems, we couldn't get any data on the real-life performance of the backdoor. More research needs to be done on these findings. 
+
 \section{STRIP \label{STRIP}}
-We took a look at the STRIP defense \cite{Strip}, more specifically to the STRIP-Vita defense \cite{StripVita}, which is an extended version of STRIP to be able to handle Vision, Text, and Audio. We wanted to know if this new way of triggering a backdoor would perhaps be resistant to some defences. Strip was chosen because of its popularity, high accuracy and the relatively simple implementation. As far as we know we are the first to run strip on mobile hardware.
+We took a look at the STRIP defense \cite{Strip}, more specifically the STRIP-Vita defense \cite{StripVita}, which is an extended version of STRIP to be able to handle Vision, Text, and Audio. We wanted to know if this new way of triggering a backdoor would perhaps be resistant to some defenses. Strip was chosen because of its popularity, high accuracy, and relatively simple implementation. As far as we know, we are the first to run STRIP on mobile hardware.
 
 \begin{center}
     \begin{figure}[!hbt]
@@ -616,9 +631,11 @@ We took a look at the STRIP defense \cite{Strip}, more specifically to the STRIP
     \label{fig:strip_schema}
 \end{center}
 
-In the same google collab files, we wrote an extra section that, after converting all the testing data to MFCCs, exports them to a JSON file. This file is rather big and when loading and parsing this file on the phone we ran into memory problems. To quickly elevate this problem we wrote a Java program to convert this JSON file to a native java float array. We then exported this array to a file and transferred it onto the phone. On loading the app the STRIP class is instantiated and the MFCCs are loaded into memory. If the user records some audio, we convert the audio to an MFCC, which we will then superimpose by adding a random MFCC from our dataset to the recorded audio MFCC. We then evaluate the superimposed MFCC by running it through our tflite model and calculate the entropy of the resulting confidence scores. We repeat this step 50 times to get a distribution. Ideally you want as much data as you can get, however the this would also increase the time spend computing. These results numbers gave us a good tradeoff of still being relatively fast and still providing enough data to distinguish poisned and not poisoned input. We then do this whole process another 50 times to get an array of entropies. The superimposing is done by simply iterating over the rows and columns of the MFCC, adding up the values of the two MFCCs at that position. This way, the evaluation of a recording takes 12 seconds instead of 32ms, which is a lot. The most time is taken up by the model evaluating the superimposed samples, which we observed by logging the time it takes to run each step of the STRIP defense. The other steps, like superimposing, took between 0-1ms.
+In the same google collab files, we wrote an extra section that, after converting all the testing data to MFCCs, exports them to a JSON file. This file is rather big, and when loading and parsing this file on the phone, we ran into memory problems. To quickly elevate this problem we wrote a Java program to convert this JSON file to a native Java float array. We then exported this array to a file and transferred it onto the phone. On loading the app the STRIP class is instantiated and the MFCCs are loaded into memory. If the user records some audio, we convert the audio to an MFCC, which we will then superimpose by adding a random MFCC from our dataset to the recorded audio MFCC. 
 
-Now that we have an array of entropies we can see whether an input was poisened by the mean and standard deviation. \autoref{fig:strongTrigger} and \autoref{fig:weakTrigger} show a graph of the entropy, charachteristicvs of the triggered input is the low mean and low standard deviation. Currently in the app we say that an input is poisoned if either the sdtandrad deviatin is below a threshold or the mean is below a threshold. This gave us the best results but also gives us false positives. Depending on oyur use case you can make the threshold more strict or loose. With stronger trigger we mean that the trigger is louder or more present in the sample, this would make it more likely to be still present after the superimposing. Even if the malicious input didn't give us the backdoor class but a different class, we could still detect if the input contained a trigger since maybe in htis evaluation the trigger did not fully work but in a superimposed MFCC the trigger could work. 
+This superimposed MFCC is then evaluated by running it through the TensorFlow Lite model to obtain the confidence scores for each class prediction. We repeat this step 50 times to get a distribution of entropy values. Ideally, you want as much data as you can get, however, this would also increase the time spent computing. These results numbers gave us a good tradeoff of still being relatively fast and still providing enough data to distinguish poisoned and not poisoned input. We then do this whole process another 50 times to get an array of entropies. The superimposing is done by simply iterating over the rows and columns of the MFCC, adding up the values of the two MFCCs at that position. When using STRIP, the evaluation of a recording takes 5 seconds instead of 32ms, which is a sizeable difference. The most time is taken up by the model evaluating the superimposed samples, which we observed by running profilers and investigating the call stack.  The smaller CNN takes an average of 7ms to evaluate a sample whereas the big CNN takes 123 ms and the LSTM 36 ms. Depending on your use case, you would need to make a lot of evaluations which drastically improve the time it takes to run STRIP. The other steps, like superimposing, took between 0-1ms.
+
+Now that we have an array of entropies we can see whether an input was poisoned by the mean and standard deviation. \autoref{fig:strongTrigger} and \autoref{fig:weakTrigger} show a graph of the entropy, characteristics of the triggered input are the low mean and low standard deviation. Currently, in the app, we say that an input is poisoned if either the standard deviation is below a threshold or the mean is below a threshold. This gave us the best results but also gives us false positives. Depending on your use case you can make the threshold more strict or loose. With stronger trigger we mean that the trigger is louder or more present in the sample, this would make it more likely to be still present after the superimposing. Even if the malicious input didn't give us the backdoor class but a different class, we could still detect if the input contained a trigger since maybe in this evaluation the trigger did not fully work, but in a superimposed MFCC, the trigger could work. 
 
 \begin{minipage}{\textwidth}
 \centering
@@ -654,13 +671,28 @@ Now that we have an array of entropies we can see whether an input was poisened 
 \end{minipage}
 \end{minipage}
 
-We tried many thresholds but for our purposes these worked well enough. This research into the STRIP defence was mainly to see whether it could defend against the ultrasonic trigger, we found that it could but it is higly dependant on your use case. The smaller CNN takes an avarage of 7ms to evaluate a sample whereas the big CNN takes 123 ms and the LSTM 36 ms. Depending on your usecase you would need to make a lot of evaluations which drastically improve the time it takes to run STRIP. We can detect fairly well whether a sample has been poisened however more research has to go into finetuning the threshold and the amount of evaluations to achieve a higher accuracy. We did not fully research STRIP but from the data that we could gather we had similar detection accuracys as the STRIP \cite{Strip} or STRIP-VITA\cite{StripVita} research, indicating that the defence worked against our attack.
-
+In our evaluation of the STRIP defense, we experimented with various thresholds, where we tried to balance detection accuracy and computational efficiency. This research into the STRIP defense was mainly to see whether it could defend against the ultrasonic trigger, we found that it could, but it is highly dependent on your use case. We can detect fairly well whether a sample has been poisoned however more research has to go into finetuning the threshold and the amount of evaluations to achieve a higher accuracy. We did not fully research STRIP but from the data that we could gather we had similar detection accuracies as the STRIP \cite{Strip} or STRIP-VITA\cite{StripVita} research, indicating that the defense worked against our attack.
 
 \chapter{Conclusion}
+In this thesis, we explored the potential security risks associated with backdoor attacks in neural network-based audio classification and speaker identification applications. We investigated the feasibility of creating a trigger, which is inaudible to humans, but would still be efficient and successful. To create this trigger, we exploited non-linearities in MEMS microphone hardware configurations. This allowed us to create a trigger of 2 kHz by playing two ultrasonic sounds well beyond human hearing. The setup used in this research has a small range which is a limitation of the attack. We tested the presence of the trigger on multiple phones which all showed the trigger, albeit at different loudness levels.
+
+Through extensive experiments on various neural network models, including Small CNNs, Big CNNs, and LSTMs, we obtained insightful results. In the context of audio classification, our experiments revealed that backdoor attacks could be highly effective in digital environments. The attack success rate was consistently high, even with low poisoning levels of 1\%, showing the potential of these attacks in manipulating audio classifiers. Meanwhile, the trigger was completely inaudible and worked even when using a very low sample rate like 8 kHz. However, we also identified the need for further research, as the real-life backdoor accuracy could vary significantly from the digital backdoor accuracy, especially in certain neural network architectures. Our experiments demonstrated that the choice of neural network architecture played a crucial role in the backdoor accuracy, with CNN-based models showing greater vulnerability compared to LSTM models in real-life scenarios. 
+
+Furthermore, we extended our investigation to speaker recognition applications using the LibriSpeech dataset. The speaker identification models achieved remarkable (digital) accuracy, but we observed challenges in real-life scenarios. In real life the models behaved inconsistently and testing speaker identification was not possible. While the backdoor attacks were successful in digital environments, in real life, the backdoor couldn't be triggered at all.
+
+Moreover, as part of our research, we explored the STRIP defense method. Strip aims to identify and mitigate backdoor attacks in neural network models by analyzing class prediction entropy. We wanted to see if Strip would still be a good defense for this particular attack. We have adapted the STRIP code to be able to run on a mobile phone. To our knowledge, we are the first to have the STRIP defense running on a mobile phone. The STRIP defense showed promising results in detecting and neutralizing the backdoor triggers albeit at a cost of a significantly increased processing time.
+
+In conclusion, backdoor attacks pose significant security risks in audio classification and speaker recognition applications. While the digital backdoor accuracy remains high, real-life performance can be affected by various factors, including recording environments and the choice of neural network architecture. These findings show that the attack is very promising but more research still has to be done.
+
 \chapter{Future work}
-\section{Improvements}
-This research did not focus on optimizing the attack. Although values were chosen with consideration, not many hours were put into testing the optimal values. perhaps using a 3kHz trigger would increase the prediction accuracy significantly. 
+During our research on backdoor attacks in neural networks, we primarily focused on a single sine wave trigger, which remained consistent across all our experiments. However, to further investigate potential ways to bypass the STRIP defense, we explored multi-trigger attacks. The sound-producing device can produce a wide range of frequencies so we can very easily extend our attack by using more than one trigger. We took some time to explore this area, but because of time constraints, we couldn't fully explore this type of trigger. In our research, during the creation of the poisoned dataset, we randomly chose one of the four trigger frequencies to append to each poisoned sample. We found that the attack still worked, but the accuracy was lower. 
+
+More research can go into trying this attack with more triggers, there is nothing holding us to the 2 kHz sine wave that we used during these experiments. Perhaps even using a different frequency the attack will have a higher success rate. The sound-producing device can not only produce sine waves but also triggers in the form of spoken commands or specific audio patterns, which is demonstrated in \cite{POSTER} \cite{DOLPHIN}. 
+
+The trigger strength hugely impacts the attack success rate, so more research into amplifying the trigger can have a huge impact. We experimented by using some amplification chips, but when inspecting their output with an oscilloscope, we found that the output signal was no longer the ultrasonic frequency that we put in. This area lies outside our expertise, and despite our efforts, we were unable to find a suitable amplifier chip for our specific needs. For those with expertise in amplifier design, exploring the creation of a custom amplifier for the trigger frequencies could be interesting.
+
+It is important to emphasize that our research primarily served as a proof-of-concept to demonstrate the feasibility of the ultrasonic trigger-based backdoor attack. While we successfully executed the attack in controlled settings, additional research and testing are needed to perform this attack in real-life scenarios.
+
 \newpage
 \bibliographystyle{plain}
 \bibliography{references.bib}
