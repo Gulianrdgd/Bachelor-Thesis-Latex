@@ -63,7 +63,7 @@
 %             ||               %
 %             \/               %
 
-\def\thesistitle{BatBackDoor: Backdoor attack on deep neural networks using inaudible triggers}
+\def\thesistitle{Backdoor attack on deep neural networks using inaudible triggers}
 \def\thesissubtitle{Ultrasonic trigger inaudible to humans but not machines}
 \def\thesisauthorfirst{Julian van der Horst}
 \def\thesisauthorsecond{}
@@ -139,30 +139,35 @@
 
 \tableofcontents
 
+\newpage
+\section*{Abstract}
+This thesis delves into the exploration of backdoor attacks in audio-based neural network applications, with a specific focus on exploiting non-linearities in MEMS microphone architectures to create triggers in audio recordings, which are inaudible to humans. By conducting experiments on various neural network architectures, sample rates, and audio neural network applications, we investigate the success rate of backdoor attacks in digital environments and evaluate the real-life applicability of such attacks on mobile phones. Our research successfully exploits these non-linearities to create triggers that are imperceptible to humans (twice the maximum human audible frequency) yet register as 2 kHz tones on mobile phones.
+
+Furthermore, we explore the STRIP defense, a runtime method designed to detect a trigger. We successfully ran the STRIP defense on a mobile phone and detected our trigger, but it comes at the cost of computational complexity. As far as we know, we are the first to try the STRIP defense on mobile phones. 
+
+\newpage
 \chapter{Introduction}
 The widespread adoption of neural networks has revolutionized the field of audio processing, enabling remarkable advancements in speech recognition, audio classification, and speaker identification applications. These AI-powered systems have found their way into our daily lives, from voice assistants on smartphones to smart home devices and security systems. However, as the reliance on these AI models grows, so does the need to ensure their security and resilience against potential attacks.
 
-One particularly concerning threat to neural networks is the presence of backdoor attacks. Backdoors are hidden vulnerabilities deliberately injected into the model, enabling adversaries to exploit and manipulate the behavior of a neural network. This thesis explores backdoor attacks in audio-based neural network applications, seeking to uncover their potential impact and vulnerabilities. More specifically this research exploits non-linearities in MEMS microphone architectures to create a trigger that is present in recordings but nonaudible to humans. 
+One particularly concerning threat to neural networks is the presence of backdoor attacks. Backdoors are hidden vulnerabilities deliberately injected into the model, enabling adversaries to exploit and manipulate the behavior of a neural network. This thesis explores backdoor attacks in audio-based neural network applications, seeking to uncover their potential impact and vulnerabilities. More specifically, this research exploits non-linearities in MEMS microphone architectures to create a trigger that is present in recordings but nonaudible to humans. This trigger is created by playing two different ultrasonic tones, which we achieve on cheap and widely available hardware.
 
 We conduct extensive experiments using various neural network architectures and sample rates. We focus primarily on word classification but also explore the efficacy of this backdoor attack on speaker identification models. The trained models are deployed on a mobile phone using a custom-made app. By testing the models on physical devices, we assess the practical applicability and robustness of this specific backdoor attack in real-world scenarios.
 
-Furthermore, as a possible countermeasure against this specific backdoor attack, we will explore the STRIP defense, a method that aims to detect and neutralize backdoor triggers at runtimes. We programmed STRIP so that it can run on the same phone as the TensorFlow model, which as far as we know we are the first to do so.
+Furthermore, as a possible countermeasure against this specific backdoor attack, we will explore the STRIP defense, a method that aims to detect and neutralize backdoor triggers at runtimes. We programmed STRIP so that it can run on the same phone as the TensorFlow model, which, as far as we know, we are the first to do so.
 
 \chapter{Background}
 \section{Automatic Speech Recognition (ASR)}
 Automatic Speech Recognition, otherwise known as ASR, has been around since 1952 when bell labs were able to recognize digits spoken over the phone \cite{ASRHistory}. Back then, analog circuitry was used to understand the incoming signal and identify a digit. The early ASR systems relied on analog circuitry to process the incoming audio signals and identify the spoken digits. However, with the advancements in deep learning, modern ASR systems have transitioned to using sophisticated neural network models to process audio data and perform speech recognition tasks.
 
-In the current state-of-the-art ASR systems, deep learning models play a pivotal role. These models are trained on vast amounts of audio data to learn the patterns and characteristics of human speech. One of the widely used techniques to represent audio in a form suitable for neural network training is the Mel-frequency cepstral coefficient (MFCC). MFCC, first introduced in the 1980s, remains a crucial feature extraction method in ASR due to its ability to focus on information from human speech and deemphasize other information \cite{dave2013feature}.
+In the current state-of-the-art ASR systems, deep learning models play a pivotal role. These models are trained on vast amounts of audio data to learn the patterns and characteristics of human speech. ne widely used technique to represent audio in a form suitable for neural network training is the Mel-frequency cepstral coefficient (MFCC). MFCC, first introduced in the 1980s, remains a crucial feature extraction method in ASR due to its ability to focus on information from human speech and deemphasize other information \cite{dave2013feature}.
 
 
 \section{Backdoor attacks}
-Backdoor attacks pose a serious threat to the security and reliability of neural networks. These attacks involve inserting a specific input pattern, known as a "backdoor trigger," into the training data, leading the neural network to exhibit malicious behavior when encountering this trigger during inference. In such cases, regardless of the input features, the network will consistently produce a pre-determined label chosen by the adversary.
+Backdoor attacks pose a severe threat to the security and reliability of neural networks. These attacks involve inserting a specific input pattern, known as a "backdoor trigger," into the training data, leading the neural network to exhibit malicious behavior when encountering this trigger during inference. In such cases, regardless of the input features, the network will consistently produce a pre-determined label chosen by the adversary.
 
 This behavior can be achieved either by transfer learning \cite{LATENTBACKDOORS} or data poisoning \cite{OVERVIEWBACKDOOR}, we used the data poisoning approach. Data poisoning has emerged as a popular approach due to its effectiveness and relative ease of implementation. Extensive research has been conducted in this field, validating the practicality and potential impact of backdoor attacks \cite{CYHI} \cite{BACKDOORCOMPARE} \cite{BADNETS}. In this attack, an adversary modifies samples from the original dataset to include a  trigger.  The neural network then learns the association between the trigger and the targeted label, leading to the backdoor's activation when the trigger is present during inference.
 
-In this research we considered a backdoor to be effective when it triggered the network to misclassify inputs with the targeted label in over 80\% of cases. This way the backdoor can be used effectively for the adversary's intended purposes. To evaluate the effectiveness of the backdoor attack, we conducted extensive experiments on various neural network architectures and datasets. The measurements and method are more elaborated in the experimental results in \autoref{chap:experimental_results}. 
-
-% \todo{In Latex you can use directly the instruction "autoref\{\}" to reference an other section that has a label. This is what we usually do. So here it would be autoref{sec:chapter4} after we added the label{chap:chapter4} in chapter 4. I suggest keeping my reference.} 
+In this research, we considered a backdoor to be effective when it triggered the network to misclassify inputs with the targeted label in over 80\% of cases. This way the backdoor can be used effectively for the adversary's intended purposes. To evaluate the effectiveness of the backdoor attack, we conducted extensive experiments on various neural network architectures and datasets. The measurements and method are more elaborated in the experimental results in \autoref{chap:experimental_results}. 
 
 
 \section{Microphone}
@@ -205,7 +210,7 @@ Firstly, a 16 kHz sample rate allows for a maximum trigger frequency of 8 kHz be
 
 Secondly, both datasets (TensorFlow speech commands and LibriSpeech ASR corpus) contained samples that were recorded at a 16 kHz sample rate. By keeping the sample rate at 16 kHz, we eliminate the need for upsampling or downsampling during preprocessing. 
 
-Thirdly, it makes training faster since less data needs to be converted to Mel-frequency cepstral coefficients (MFCCs) compared to a sample sampled at higher frequencies like 44.1 kHz. This is because to create the MFCCs, many computationally intensive calculations must be run on the samples \cite{1692543}. A sample with a sample rate of 44.1 kHz has 44100 samples per second of audio compared to 16000 samples per second from the sample with a sample rate of 16 kHz. If we have more samples, we need to do more of these computationally intensive computations, and thus have a longer execution time. 
+Thirdly, it makes training faster since less data needs to be converted to Mel-frequency cepstral coefficients (MFCCs) compared to a sample sampled at higher frequencies like 44.1 kHz. This is because to create the MFCCs, many computationally intensive calculations must be run on the samples \cite{1692543}. A sample with a sample rate of 44.1 kHz has 44100 samples per second of audio compared to 16000 samples per second from the sample with a sample rate of 16 kHz. If we have more samples, we need to do more of these computationally intensive computations and thus have a longer execution time. 
 
 The speech commands dataset contains many 1-second clips of spoken English words. For my experiments, we have run it both using ten classes and the full 30 classes. We omitted the files which were not exactly one second, resulting in the following numbers of samples:
 
@@ -248,6 +253,8 @@ To determine the scaling factor for our experimental setup, we conducted tests b
 In our research, we explored three different neural network architectures. We have used 2 Convolutional Neural Networks (CNN) and one Long Short-Term Memory Network (LSTM). These networks are the same ones used in \cite{CYHI}. All the models have the same basic code base, which is taken from the speech recognition example on the Tensorflow website \cite{TenserflowExample}. This code is modified to convert the (poisoned) audio samples to an MFCC before adding the data to a test and train set. The models are made using Keras, and after training, they are converted to a Tensorflow Lite model so that they can be run on a smartphone. 
 
 For all the models, we have used sparse categorical cross-entropy as a loss function, and we have used the Adam optimizer for the optimizer. The CNN models were trained with a learning rate of 0.001, while the LSTM model used a learning rate of 0.0001. We used a batch size of 25 and ran it for 25 epochs. We came to these values by trying out many different values, and after some trial and error, we found that these numbers were sufficient as they provided a good balance between training time and accuracy improvement.
+
+\newpage
 
 The experiments were conducted using Google Colab, a cloud-based platform that provides access to powerful GPU resources for training deep learning models. TensorFlow version 2.8.4 was used for the experiments. The code can be found as python notebooks on Github \cite{GH}.
 
@@ -331,14 +338,14 @@ The real-life experimental setup is depicted in \autoref{fig:reallife-setup}, wh
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[width=0.8\textwidth]{img/setup.jpg}
+    \includegraphics[width=\textwidth]{img/setup.jpg}
     \caption{The sound-producing setup}
     \label{fig:reallife-setup}
 \end{figure}
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[width=0.8\textwidth]{img/diagram.png}
+    \includegraphics[width=\textwidth]{img/diagram.png}
     \caption{A diagram of the setup}
     \label{fig:diagram-setup}
 \end{figure}
@@ -363,7 +370,7 @@ Moreover, the app incorporates the STRIP defense, which is further elaborated in
     \centering
     \includegraphics[scale=0.1]{img/app_2.jpg}
     \captionof{figure}{The TensorFlow lite app with dropdown}
-    \label{fig:theApp}
+    \label{fig:theAppWDropdown}
 \end{minipage}
 \end{minipage}
 
@@ -660,14 +667,14 @@ Now that we have an array of entropies we can see whether an input was poisoned 
     \centering
     \includegraphics[width=0.5\textwidth]{img/poisoned.jpg}
     \captionof{figure}{The app showing a poisoned sample}
-    \label{fig:strongTrigger}
+    \label{fig:poisonedSample}
 \end{minipage}
 \hspace{0.1\textwidth}
 \begin{minipage}{.4\textwidth}
     \centering
     \includegraphics[width=0.5\textwidth]{img/notPoisoned.jpg}
     \captionof{figure}{The app showing a non-poisoned sample}
-    \label{fig:weakTrigger}
+    \label{fig:nonPoisonedSample}
 \end{minipage}
 \end{minipage}
 
